@@ -49,7 +49,8 @@
       padding: 20px;
       background: #f8f9fa;
       border-right: 1px solid #ddd;
-      overflow-y: auto;
+      overflow-y: visible; /* was auto */
+      max-height: none;    /* optional safeguard */
     }
     
     #sectorFilters {
@@ -297,6 +298,7 @@
 </body>
 
 </html>
+
 
 
 
