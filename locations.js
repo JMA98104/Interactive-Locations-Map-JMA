@@ -1931,13 +1931,16 @@ const locations = [
     },
     {
       name: "Interbay Self Storage",
+      lat: 47.6515,
+      lng: -122.3766,
       city: "Seattle",
       state: "WA",
-      region: "Seattle Metro",
+      region: "Puget Sound",
+      sector: ["Self-Storage"],
       type: ["Self-Storage"],
-      lat: 47.6451,
-      lng: -122.3761,
-      projects: 1
+      projects: 1,
+      cutsheet: "https://marketing.jacksonmain.com/books/htfy/",
+      thumbnail: "https://marketing.jacksonmain.com/images/interbay-thumbnail.jpg"
     },
     {
       name: "Kent Self Storage",
@@ -2652,4 +2655,5 @@ const locations = [
                                
                   
     ];  
+
     
