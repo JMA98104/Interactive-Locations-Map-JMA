@@ -2,12 +2,42 @@ let map;
 let markers = [];
 let infoWindow;
 
-function initMap() {
+window.initMap = function () {
   map = new google.maps.Map(document.getElementById("map"), {
-    center: { lat: 47.6062, lng: -122.3321 },
-    zoom: 7,
+    center: { lat: 39.8283, lng: -98.5795 }, // Center of US
+    zoom: 4,
+    fullscreenControl: false,
     mapTypeControl: false,
+    streetViewControl: false,
+    zoomControl: true,
+    styles: [
+      { elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
+      { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+      { elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+      { elementType: "labels.text.stroke", stylers: [{ color: "#f5f5f5" }] },
+      { featureType: "administrative.land_parcel", elementType: "labels.text.fill", stylers: [{ color: "#bdbdbd" }] },
+      { featureType: "poi", elementType: "geometry", stylers: [{ color: "#eeeeee" }] },
+      { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+      { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#e5e5e5" }] },
+      { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
+      { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+      { featureType: "road.arterial", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+      { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#dadada" }] },
+      { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+      { featureType: "road.local", elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
+      { featureType: "transit.line", elementType: "geometry", stylers: [{ color: "#e5e5e5" }] },
+      { featureType: "transit.station", elementType: "geometry", stylers: [{ color: "#eeeeee" }] },
+      { featureType: "water", elementType: "geometry", stylers: [{ color: "#c9c9c9" }] },
+      { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] }
+    ]
   });
+
+  setupFilters();
+  placeMarkers();
+  setupFilterControls();
+  filterMarkersAndTable();
+};
+
 
   infoWindow = new google.maps.InfoWindow();
 
@@ -111,3 +141,4 @@ function applyFilters() {
 }
 
 window.initMap = initMap;
+
