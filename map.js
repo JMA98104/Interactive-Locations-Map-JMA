@@ -1,6 +1,6 @@
 let map;
 let markers = [];
-let infoWindow;
+let allBounds;
 
 window.initMap = function () {
   map = new google.maps.Map(document.getElementById("map"), {
@@ -38,107 +38,143 @@ window.initMap = function () {
   filterMarkersAndTable();
 };
 
-
-  infoWindow = new google.maps.InfoWindow();
-
-  renderMap(locations);
-  renderTable(locations);
-
-  // Set initial project count
-  document.getElementById("projectCount").textContent = locations.reduce((sum, loc) => sum + Number(loc.projects || 0), 0);
-}
-
-function renderMap(list) {
-  clearMarkers();
-
-  list.forEach((loc) => {
-    const marker = new google.maps.Marker({
-      position: loc.latLng,
-      map,
-      title: loc.name,
+function setupFilters() {
+  const sectorMap = {};
+  locations.forEach(loc => {
+    (Array.isArray(loc.type) ? loc.type : [loc.type]).forEach(type => {
+      sectorMap[type] = (sectorMap[type] || 0) + loc.projects;
     });
+  });
 
-    marker.locationData = loc;
-
-    marker.addListener("click", () => {
-      infoWindow.setContent(`<strong>${loc.name}</strong><br>${loc.city}${loc.state ? ', ' + loc.state : ''}`);
-      infoWindow.open(map, marker);
-    });
-
-    markers.push(marker);
+  const sorted = Object.entries(sectorMap).sort((a, b) => a[0].localeCompare(b[0]));
+  const filters = document.getElementById('sectorFilters');
+  filters.innerHTML = `
+    <div>
+      <input type="checkbox" id="selectAllSectors" checked>
+      <label for="selectAllSectors"><strong>Select All</strong></label>
+    </div>
+  `;
+  sorted.forEach(([type, count]) => {
+    const id = type.replace(/\s+/g, '-').toLowerCase();
+    filters.innerHTML += `
+      <div>
+        <input type="checkbox" class="sectorCheckbox" id="${id}" value="${type}" checked>
+        <label for="${id}">${type} (${count})</label>
+      </div>
+    `;
   });
 }
 
-function clearMarkers() {
-  markers.forEach((marker) => marker.setMap(null));
-  markers = [];
+function placeMarkers() {
+  allBounds = new google.maps.LatLngBounds();
+  locations.forEach((location, index) => {
+    const marker = new google.maps.Marker({
+      position: { lat: location.lat, lng: location.lng },
+      map,
+      title: location.name,
+      icon: {
+        url: 'https://www.jacksonmain.com/s/droppin2025.png',
+        scaledSize: new google.maps.Size(30, 30)
+      }
+    });
+
+    const infoWindow = new google.maps.InfoWindow({
+      content: `
+        <div style="padding: 10px; max-width: 250px; font-family: Arial; color: #004965;">
+          <h3 style="margin: 0; font-size: 18px;">${location.name}</h3>
+          <p style="margin: 5px 0 0; font-size: 14px; color: #515866;">${location.city}${location.state ? ', ' + location.state : ''}</p>
+        </div>`
+    });
+
+    marker.addListener('click', () => infoWindow.open(map, marker));
+    marker.locationData = location;
+    marker.type = location.type;
+    marker.index = index;
+    markers.push(marker);
+    allBounds.extend(marker.position);
+  });
 }
 
-function renderTable(list) {
+function setupFilterControls() {
+  document.getElementById('selectAllSectors').addEventListener('change', function () {
+    const checkboxes = document.querySelectorAll('.sectorCheckbox');
+    checkboxes.forEach(cb => cb.checked = this.checked);
+    filterMarkersAndTable();
+  });
+
+  document.getElementById('applyFilters').addEventListener('click', filterMarkersAndTable);
+}
+
+function filterMarkersAndTable() {
+  const selected = Array.from(document.querySelectorAll('.sectorCheckbox:checked')).map(cb => cb.value.toLowerCase());
+  const search = document.getElementById('locationSearch').value.toLowerCase();
+
+  let visible = [], total = 0, bounds = new google.maps.LatLngBounds();
+
+  markers.forEach(marker => {
+    const types = Array.isArray(marker.type) ? marker.type.map(t => t.toLowerCase()) : [marker.type.toLowerCase()];
+    const data = marker.locationData;
+    const searchMatch = `${data.name} ${data.city} ${data.state} ${data.region}`.toLowerCase().includes(search);
+    const sectorMatch = types.some(t => selected.includes(t));
+
+    if (sectorMatch && searchMatch) {
+      marker.setMap(map);
+      visible.push(data);
+      total += data.projects;
+      bounds.extend(marker.position);
+    } else {
+      marker.setMap(null);
+    }
+  });
+
+  // Reset view to all markers if none selected
+  if (visible.length === 0 || selected.length === 0) {
+    map.fitBounds(allBounds);
+  } else {
+    map.fitBounds(bounds);
+  }
+
+  updateTable(visible);
+  updateCount(total);
+}
+
+function updateTable(list) {
   const body = document.getElementById('projectLocationsBody');
   body.innerHTML = '';
 
   if (list.length === 0) {
-    body.innerHTML = `<tr><td colspan="3" style="text-align:center;">No results found</td></tr>`;
+    const row = document.createElement('tr');
+    row.innerHTML = `<td colspan="3" style="text-align:center;">No results found</td>`;
+    body.appendChild(row);
     return;
   }
 
-  list.forEach((loc) => {
-    const nameCell = loc.cutsheet
-      ? `<a class="project-link" data-name="${loc.name}" href="${loc.cutsheet}" target="_blank"><strong>${loc.name}</strong></a>`
-      : `<a class="project-link" data-name="${loc.name}" style="cursor:pointer;"><strong>${loc.name}</strong></a>`;
-
-    const locationLine = `<br><span style="color: #6c757d; font-size: 14px;">${loc.city}${loc.state ? ', ' + loc.state : ''}</span>`;
-    const thumbImg = loc.thumbnail
-      ? `<br><img src="${loc.thumbnail}" alt="${loc.name} image" style="max-width: 140px; margin-top: 6px; border-radius: 4px;">`
-      : '';
-
+  list.forEach((loc, i) => {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td>${nameCell}${locationLine}${thumbImg}</td>
+      <td><a class="project-link" data-index="${i}"><strong>${loc.name}</strong></a><br><span style="color: #6c757d; font-size: 14px;">${loc.city}${loc.state ? ', ' + loc.state : ''}</span></td>
       <td>${Array.isArray(loc.type) ? loc.type.join(', ') : loc.type}</td>
-      <td>${loc.projects || 1}</td>
+      <td>${loc.projects}</td>
     `;
     body.appendChild(row);
   });
 
-  // Attach event listener to project links (including ones with cutsheet links)
+  // Enable table row clicks to zoom into location
   document.querySelectorAll('.project-link').forEach(link => {
-    link.addEventListener('click', (e) => {
-      const name = e.target.closest('.project-link').dataset.name;
-      const marker = markers.find(m => m.locationData.name === name);
+    link.addEventListener('click', e => {
+      const marker = markers.find(m => m.locationData.name === e.target.textContent.trim());
       if (marker) {
         map.setZoom(10);
         map.panTo(marker.getPosition());
-        infoWindow.setContent(`<strong>${marker.locationData.name}</strong>`);
-        infoWindow.open(map, marker);
+        new google.maps.InfoWindow({
+          content: `<strong>${marker.locationData.name}</strong>`
+        }).open(map, marker);
       }
     });
   });
 }
 
-function applyFilters() {
-  const checkedTypes = Array.from(document.querySelectorAll(".type-filter:checked")).map(cb => cb.value);
-  const searchText = document.getElementById("searchInput").value.toLowerCase();
-
-  const filteredList = locations.filter(loc => {
-    const matchesType = checkedTypes.includes("All") || (Array.isArray(loc.type)
-      ? loc.type.some(type => checkedTypes.includes(type))
-      : checkedTypes.includes(loc.type));
-
-    const matchesSearch = loc.name.toLowerCase().includes(searchText)
-      || loc.city.toLowerCase().includes(searchText)
-      || (loc.state && loc.state.toLowerCase().includes(searchText));
-
-    return matchesType && matchesSearch;
-  });
-
-  renderMap(filteredList);
-  renderTable(filteredList);
-
-  // Update the project count at top
-  document.getElementById("projectCount").textContent = filteredList.reduce((sum, loc) => sum + Number(loc.projects || 0), 0);
+function updateCount(total) {
+  const div = document.getElementById('projectTotal');
+  div.innerHTML = `<strong>Total Projects Found:</strong> ${total}`;
 }
-
-window.initMap = initMap;
-
