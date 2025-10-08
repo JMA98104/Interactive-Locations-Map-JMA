@@ -268,8 +268,7 @@
         document.head.appendChild(gmaps);
 
         const cluster = document.createElement('script');
-        cluster.src = "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js";
-        document.head.appendChild(cluster);
+       <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
 
         const locationsScript = document.createElement('script');
         locationsScript.src = "locations.js";
@@ -308,4 +307,5 @@
   </script>
 </body>
 </html>
+
 
