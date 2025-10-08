@@ -4,6 +4,10 @@ let allBounds;
 
 window.initMap = function () {
   map = new google.maps.Map(document.getElementById("map"), {
+    setTimeout(() => {
+    google.maps.event.trigger(map, "resize");
+    map.panBy(0, 0); // Trigger a slight pan to force redraw
+    }, 500);
     center: { lat: 39.8283, lng: -98.5795 }, // Center of US
     zoom: 4,
     fullscreenControl: false,
@@ -36,6 +40,8 @@ window.initMap = function () {
   placeMarkers();
   setupFilterControls();
   filterMarkersAndTable();
+  google.maps.event.trigger(map, "resize");
+
 };
 
 function setupFilters() {
@@ -193,5 +199,14 @@ function updateCount(total) {
   const div = document.getElementById('projectTotal');
   div.innerHTML = `<strong>Total Projects Found:</strong> ${total}`;
 }
+// Ensure initMap is called after page is fully ready and locations are available
+window.addEventListener('load', () => {
+  if (typeof locations !== 'undefined' && Array.isArray(locations)) {
+    initMap();
+  } else {
+    console.error("Locations data not loaded or improperly formatted.");
+  }
+});
+
 
 
