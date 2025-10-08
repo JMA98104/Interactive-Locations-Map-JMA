@@ -225,6 +225,34 @@
   </div>
 </body>
 </html>
+ <div class="project-locations">
+      <div class="project-locations-header">
+        <h2>Project Locations</h2>
+        <button id="toggleLocations">▲</button>
+      </div>
+      <div id="projectTotal">
+        <strong>Total Projects Found:</strong> 0
+      </div>
+      <div id="projectLocationsWrapper" style="display: none;">
+        <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+          <thead style="position: sticky; top: 110px; background-color: #f4f6f8; z-index: 3;">
+            <tr>
+              <th style="padding: 12px 15px; border-bottom: 1px solid #ddd;">Project Name</th>
+              <th style="padding: 12px 15px; border-bottom: 1px solid #ddd;">Sector</th>
+              <th style="padding: 12px 15px; border-bottom: 1px solid #ddd;">Projects</th>
+            </tr>
+          </thead>
+        </table>
+        <div style="max-height: 300px; overflow-y: auto;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tbody id="projectLocationsBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- Lazy Load Scripts -->
   <script>
     let mapLoaded = false;
@@ -279,3 +307,4 @@
   </script>
 </body>
 </html>
+
