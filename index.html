@@ -225,7 +225,7 @@
   </div>
 </body>
 </html>
- <!-- Lazy Load Scripts -->
+  <!-- Lazy Load Scripts -->
   <script>
     let mapLoaded = false;
     function lazyLoadMap() {
@@ -251,4 +251,31 @@
         document.head.appendChild(mapScript);
       }
     }
-    const observer = new IntersectionObser
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          lazyLoadMap();
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const mapEl = document.getElementById('map');
+      if (mapEl) observer.observe(mapEl);
+
+      document.getElementById('toggleLocations').addEventListener('click', function () {
+        const wrapper = document.getElementById('projectLocationsWrapper');
+        if (wrapper.style.display === 'none') {
+          wrapper.style.display = 'block';
+          this.innerHTML = '▲';
+        } else {
+          wrapper.style.display = 'none';
+          this.innerHTML = '▼';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
