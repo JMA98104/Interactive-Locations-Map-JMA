@@ -228,32 +228,35 @@
     </div>
 
     <div class="project-locations">
-      <div class="project-locations-header">
-        <h2>Project Locations</h2>
-        <button id="toggleLocations">▲</button>
-      </div>
-
-      <div id="projectTotal">
-        <strong>Total Projects Found:</strong> <span id="totalProjects">0</span>
-      </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Project Name</th>
-            <th>Sector</th>
-            <th>Projects</th>
-          </tr>
-        </thead>
-      </table>
-
-      <div class="scroll-table-wrapper">
-        <table>
-          <tbody id="projectLocationsBody"></tbody>
-        </table>
-      </div>
-    </div>
+  <div class="project-locations-header">
+    <h2>Project Locations</h2>
+    <button id="toggleLocations">▲</button>
   </div>
+
+  <div id="projectTotal">
+    <strong>Total Projects Found:</strong> <span id="totalProjects">0</span>
+  </div>
+
+  <!-- Move the table header OUTSIDE the scroll container -->
+  <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+    <thead style="background-color: #f4f6f8; z-index: 3;">
+      <tr>
+        <th style="padding: 12px 15px; border-bottom: 1px solid #ddd;">Project Name</th>
+        <th style="padding: 12px 15px; border-bottom: 1px solid #ddd;">Sector</th>
+        <th style="padding: 12px 15px; border-bottom: 1px solid #ddd;">Projects</th>
+      </tr>
+    </thead>
+  </table>
+
+  <!-- Make only the body scrollable -->
+  <div style="max-height: 400px; overflow-y: auto;">
+    <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+      <tbody id="projectLocationsBody">
+        <!-- Rows populated by JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
 
   <!-- Lazy Load Scripts -->
   <script>
@@ -308,4 +311,5 @@
   </script>
 </body>
 </html>
+
 
