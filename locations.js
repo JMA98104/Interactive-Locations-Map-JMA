@@ -1936,11 +1936,10 @@ const locations = [
       city: "Seattle",
       state: "WA",
       region: "Puget Sound",
-      sector: ["Self-Storage"],
-      type: ["Self-Storage"],
+      type: ["Self-Storage"],         // or sector: but keep `type` since your filters use it
       projects: 1,
       cutsheet: "https://marketing.jacksonmain.com/books/htfy/",
-      thumbnail: "https://marketing.jacksonmain.com/images/interbay-thumbnail.jpg"
+      thumbnail: "https://jackson-main-staging.squarespace.com/s/78e2f27c-3b1b-432e-95d5-112a3f919b57.jpg"
     },
     {
       name: "Kent Self Storage",
@@ -2656,4 +2655,5 @@ const locations = [
     ];  
 
     
+
 
