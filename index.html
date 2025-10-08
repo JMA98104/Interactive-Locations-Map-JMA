@@ -262,7 +262,11 @@
       if (!mapLoaded) {
         mapLoaded = true;
         const gmaps = document.createElement('script');
-        gmaps.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDIfZAl4HpvdM02gciIlthJBfoV6CnDd2E&callback=initMap";
+        <script
+          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDIfZAl4HpvdM02gciIlthJBfoV6CnDd2E&callback=initMap"
+          async
+        ></script>
+        ;
         gmaps.async = true;
         gmaps.defer = true;
         document.head.appendChild(gmaps);
@@ -307,5 +311,6 @@
   </script>
 </body>
 </html>
+
 
 
