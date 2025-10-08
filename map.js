@@ -13,12 +13,15 @@ function initMap() {
 
   renderMap(locations);
   renderTable(locations);
+
+  // Set initial project count
+  document.getElementById("projectCount").textContent = locations.reduce((sum, loc) => sum + Number(loc.projects || 0), 0);
 }
 
-function renderMap(filteredList) {
+function renderMap(list) {
   clearMarkers();
 
-  filteredList.forEach((loc) => {
+  list.forEach((loc) => {
     const marker = new google.maps.Marker({
       position: loc.latLng,
       map,
@@ -41,49 +44,48 @@ function clearMarkers() {
   markers = [];
 }
 
-function updateTable(list) {
+function renderTable(list) {
   const body = document.getElementById('projectLocationsBody');
   body.innerHTML = '';
 
   if (list.length === 0) {
-    body.innerHTML = `<tr><td colspan="4" style="text-align:center;">No results found</td></tr>`;
+    body.innerHTML = `<tr><td colspan="3" style="text-align:center;">No results found</td></tr>`;
     return;
   }
 
   list.forEach((loc) => {
     const nameCell = loc.cutsheet
-      ? `<a class="project-link" href="${loc.cutsheet}" target="_blank"><strong>${loc.name}</strong></a>`
-      : `<strong>${loc.name}</strong>`;
+      ? `<a class="project-link" data-name="${loc.name}" href="${loc.cutsheet}" target="_blank"><strong>${loc.name}</strong></a>`
+      : `<a class="project-link" data-name="${loc.name}" style="cursor:pointer;"><strong>${loc.name}</strong></a>`;
 
     const locationLine = `<br><span style="color: #6c757d; font-size: 14px;">${loc.city}${loc.state ? ', ' + loc.state : ''}</span>`;
-
     const thumbImg = loc.thumbnail
       ? `<br><img src="${loc.thumbnail}" alt="${loc.name} image" style="max-width: 140px; margin-top: 6px; border-radius: 4px;">`
       : '';
 
-    body.innerHTML += `
-      <tr>
-        <td>${nameCell}${locationLine}${thumbImg}</td>
-        <td>${Array.isArray(loc.type) ? loc.type.join(', ') : loc.type}</td>
-        <td>${loc.projects || 1}</td>
-      </tr>`;
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${nameCell}${locationLine}${thumbImg}</td>
+      <td>${Array.isArray(loc.type) ? loc.type.join(', ') : loc.type}</td>
+      <td>${loc.projects || 1}</td>
+    `;
+    body.appendChild(row);
   });
 
-  // Enable table row clicks to zoom into map marker
+  // Attach event listener to project links (including ones with cutsheet links)
   document.querySelectorAll('.project-link').forEach(link => {
-    link.addEventListener('click', e => {
-      const marker = markers.find(m => m.locationData.name === e.target.textContent.trim());
+    link.addEventListener('click', (e) => {
+      const name = e.target.closest('.project-link').dataset.name;
+      const marker = markers.find(m => m.locationData.name === name);
       if (marker) {
         map.setZoom(10);
         map.panTo(marker.getPosition());
-        new google.maps.InfoWindow({
-          content: `<strong>${marker.locationData.name}</strong>`
-        }).open(map, marker);
+        infoWindow.setContent(`<strong>${marker.locationData.name}</strong>`);
+        infoWindow.open(map, marker);
       }
     });
   });
 }
-
 
 function applyFilters() {
   const checkedTypes = Array.from(document.querySelectorAll(".type-filter:checked")).map(cb => cb.value);
@@ -104,8 +106,8 @@ function applyFilters() {
   renderMap(filteredList);
   renderTable(filteredList);
 
+  // Update the project count at top
   document.getElementById("projectCount").textContent = filteredList.reduce((sum, loc) => sum + Number(loc.projects || 0), 0);
 }
 
 window.initMap = initMap;
-
