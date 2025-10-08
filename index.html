@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <title>JMA Project Locations</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      font-family: 'Montserrat', sans-serif;
+      font-family: Arial, sans-serif;
       background-color: #f4f6f8;
     }
 
@@ -19,6 +18,7 @@
 
     .page-header {
       padding: 40px 30px 10px 30px;
+      text-align: left;
     }
 
     .page-header h1 {
@@ -45,27 +45,14 @@
 
     #sidebar {
       width: 300px;
-      display: flex;
-      flex-direction: column;
       padding: 20px;
       background: #f8f9fa;
       border-right: 1px solid #ddd;
-    }
-
-    #sectorFilters {
-      flex: 1;
       overflow-y: auto;
-      max-height: 300px;
-      margin-bottom: 12px;
-    }
-
-    #applyFilters {
-      margin-top: auto;
     }
 
     #map {
-      height: 100%;
-      width: 100%;
+      flex: 1;
     }
 
     #locationSearch {
@@ -102,19 +89,21 @@
       background: white;
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
+      max-height: 400px;
+      overflow-y: auto;
+      position: relative;
     }
 
     .project-locations-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
       padding: 20px;
-      background: white;
-      border-bottom: 1px solid #ddd;
+      cursor: pointer;
       position: sticky;
       top: 0;
+      background: white;
       z-index: 5;
+      border-bottom: 1px solid #ddd;
     }
 
     .project-locations-header h2 {
@@ -134,28 +123,29 @@
       border-bottom: 1px solid #ddd;
     }
 
+    #projectLocationsWrapper {
+      padding: 0 20px 20px 20px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
+      text-align: left;
       font-size: 16px;
     }
 
     thead {
-      background-color: #f4f6f8;
       position: sticky;
       top: 110px;
+      background-color: #f4f6f8;
       z-index: 3;
     }
 
     th, td {
       padding: 12px 15px;
       border-bottom: 1px solid #ddd;
-      text-align: left;
-    }
-
-    tbody {
-      max-height: 400px;
-      overflow-y: auto;
     }
 
     tr:hover {
@@ -171,87 +161,54 @@
     a.project-link:hover {
       text-decoration: underline;
     }
-
-    .logo-top-right {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-    }
-
-    .logo-top-right img {
-      height: 60px;
-    }
-
-    .disclaimer {
-      background-color:#fff8e1;
-      color:#d17b00;
-      border:1px solid #ffe0b2;
-      padding:12px 16px;
-      font-family:Montserrat, sans-serif;
-      font-size:14px;
-      margin: 16px auto;
-      width:90%;
-      max-width:900px;
-      border-radius:5px;
-    }
-
-    .scroll-table-wrapper {
-      max-height: 400px;
-      overflow-y: auto;
-    }
   </style>
 </head>
+
 <body>
   <div class="page-wrapper">
-    <div class="logo-top-right">
-      <img src="JMA%20Square%20Icon%20Logo.official.png" alt="JMA Logo">
-    </div>
-
     <div class="page-header">
       <h1>Project Locations</h1>
       <p>Explore JMA across various sectors and locations.</p>
-    </div>
-
-    <div class="disclaimer">
-      <strong>Note:</strong> If the map doesn’t appear immediately, please refresh the page. Occasionally, it may take a moment to load due to browser or network settings. Thanks for your patience!
     </div>
 
     <div class="container">
       <div id="sidebar">
         <h3>Filters</h3>
         <div id="sectorFilters"></div>
-        <input type="text" id="locationSearch" placeholder="Enter city, state, region or name" />
+        <input type="text" id="locationSearch" placeholder="Enter city, state, or region" />
         <button id="applyFilters">Apply Filters</button>
       </div>
       <div id="map"></div>
     </div>
 
     <div class="project-locations">
-  <div class="project-locations-header">
-    <h2>Project Locations</h2>
-    <button id="toggleLocations">▲</button>
+      <div class="project-locations-header">
+        <h2>Project Locations</h2>
+        <button id="toggleLocations">▲</button>
+      </div>
+      <div id="projectTotal">
+        <strong>Total Projects Found:</strong> 0
+      </div>
+      <div id="projectLocationsWrapper" style="display: none;">
+        <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+          <thead style="position: sticky; top: 110px; background-color: #f4f6f8; z-index: 3;">
+            <tr>
+              <th style="padding: 12px 15px; border-bottom: 1px solid #ddd;">Project Name</th>
+              <th style="padding: 12px 15px; border-bottom: 1px solid #ddd;">Sector</th>
+              <th style="padding: 12px 15px; border-bottom: 1px solid #ddd;">Projects</th>
+            </tr>
+          </thead>
+        </table>
+        <div style="max-height: 300px; overflow-y: auto;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tbody id="projectLocationsBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <div id="projectTotal">
-    <strong>Total Projects Found:</strong> <span id="totalProjects">0</span>
-  </div>
-
-<!-- Table with scrollable tbody and functional toggle -->
-<div class="scroll-table-wrapper">
-  <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
-    <thead style="background-color: #f4f6f8; z-index: 3;">
-      <tr>
-        <th style="padding: 12px 15px; border-bottom: 1px solid #ddd;">Project Name</th>
-        <th style="padding: 12px 15px; border-bottom: 1px solid #ddd;">Sector</th>
-        <th style="padding: 12px 15px; border-bottom: 1px solid #ddd;">Projects</th>
-      </tr>
-    </thead>
-    <tbody id="projectLocationsBody">
-      <!-- Rows populated by JS -->
-    </tbody>
-  </table>
-</div>
 
   <!-- Lazy Load Scripts -->
   <script>
@@ -259,6 +216,7 @@
     function lazyLoadMap() {
       if (!mapLoaded) {
         mapLoaded = true;
+
         const gmaps = document.createElement('script');
         gmaps.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDIfZAl4HpvdM02gciIlthJBfoV6CnDd2E&callback=initMap";
         gmaps.async = true;
@@ -293,12 +251,12 @@
       if (mapEl) observer.observe(mapEl);
 
       document.getElementById('toggleLocations').addEventListener('click', function () {
-        const section = document.querySelector('.scroll-table-wrapper');
-        if (section.style.display === 'none') {
-          section.style.display = 'block';
+        const wrapper = document.getElementById('projectLocationsWrapper');
+        if (wrapper.style.display === 'none') {
+          wrapper.style.display = 'block';
           this.innerHTML = '▲';
         } else {
-          section.style.display = 'none';
+          wrapper.style.display = 'none';
           this.innerHTML = '▼';
         }
       });
@@ -306,6 +264,3 @@
   </script>
 </body>
 </html>
-
-
-
