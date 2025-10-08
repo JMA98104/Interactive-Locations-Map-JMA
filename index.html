@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <title>JMA Project Locations</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Montserrat', sans-serif;
       background-color: #f4f6f8;
     }
 
@@ -19,6 +20,7 @@
     .page-header {
       padding: 40px 30px 10px 30px;
       text-align: left;
+      position: relative;
     }
 
     .page-header h1 {
@@ -33,6 +35,26 @@
       color: #515866;
     }
 
+    .logo-topright {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      width: 60px;
+    }
+
+    .disclaimer {
+      background-color: #fff8e1;
+      color: #d17b00;
+      border: 1px solid #ffe0b2;
+      padding: 12px 16px;
+      font-family: Montserrat, sans-serif;
+      font-size: 14px;
+      margin: 16px auto;
+      width: 90%;
+      max-width: 900px;
+      border-radius: 5px;
+    }
+
     .container {
       display: flex;
       height: 500px;
@@ -45,14 +67,27 @@
 
     #sidebar {
       width: 300px;
+      display: flex;
+      flex-direction: column;
       padding: 20px;
       background: #f8f9fa;
       border-right: 1px solid #ddd;
-      overflow-y: auto;
     }
 
-    #map {
+    #sidebar h3 {
+      position: sticky;
+      top: 0;
+      background: #f8f9fa;
+      z-index: 1;
+      padding-bottom: 10px;
+      margin-top: 0;
+    }
+
+    #sectorFilters {
       flex: 1;
+      overflow-y: auto;
+      max-height: 300px;
+      margin-bottom: 12px;
     }
 
     #locationSearch {
@@ -64,25 +99,27 @@
       margin-bottom: 10px;
     }
 
-    button {
+    #applyFilters {
+      background-color: #3E7593;
+      color: white;
       width: 100%;
       padding: 10px;
       border-radius: 5px;
       font-weight: bold;
       cursor: pointer;
       border: none;
-      margin-bottom: 5px;
-    }
-
-    #applyFilters {
-      background-color: #3E7593;
-      color: white;
+      margin-top: auto;
     }
 
     #applyFilters:hover {
       background-color: #2f5e75;
     }
 
+    #map {
+      flex: 1;
+    }
+
+    /* Additional styling for project list area (if applicable) */
     .project-locations {
       max-width: 1400px;
       margin: 0 auto 40px auto;
@@ -161,33 +198,20 @@
     a.project-link:hover {
       text-decoration: underline;
     }
+
   </style>
 </head>
-
 <body>
   <div class="page-wrapper">
     <div class="page-header">
       <h1>Project Locations</h1>
       <p>Explore JMA across various sectors and locations.</p>
+      <img src="JMA%20Square%20Icon%20Logo.official.png" class="logo-topright" alt="JMA Logo">
     </div>
 
-    <!-- DISCLAIMER BLOCK -->
-    <div style="
-      background-color:#fff8e1;
-      color:#d17b00;
-      border:1px solid #ffe0b2;
-      padding:12px 16px;
-      font-family:Montserrat, sans-serif;
-      font-size:14px;
-      margin: 16px auto;
-      width:90%;
-      max-width:900px;
-      border-radius:5px;
-    ">
-      <strong>Note:</strong> If the map doesn’t appear right away, please refresh the page.
-      Occasionally, the map may take a moment to load due to browser settings or slow network response. Thanks for your patience!
+    <div class="disclaimer">
+      <strong>Note:</strong> If the map doesn’t appear right away, please refresh the page. Occasionally, the map may take a moment to load due to browser settings or slow network response. Thanks for your patience!
     </div>
-    <!-- END DISCLAIMER BLOCK -->
 
     <div class="container">
       <div id="sidebar">
@@ -200,88 +224,4 @@
     </div>
   </div>
 </body>
-
-    <div class="project-locations">
-      <div class="project-locations-header">
-        <h2>Project Locations</h2>
-        <button id="toggleLocations">▲</button>
-      </div>
-      <div id="projectTotal">
-        <strong>Total Projects Found:</strong> 0
-      </div>
-      <div id="projectLocationsWrapper" style="display: none;">
-        <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
-          <thead style="position: sticky; top: 110px; background-color: #f4f6f8; z-index: 3;">
-            <tr>
-              <th style="padding: 12px 15px; border-bottom: 1px solid #ddd;">Project Name</th>
-              <th style="padding: 12px 15px; border-bottom: 1px solid #ddd;">Sector</th>
-              <th style="padding: 12px 15px; border-bottom: 1px solid #ddd;">Projects</th>
-            </tr>
-          </thead>
-        </table>
-        <div style="max-height: 300px; overflow-y: auto;">
-          <table style="width: 100%; border-collapse: collapse;">
-            <tbody id="projectLocationsBody">
-              <!-- Populated by JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Lazy Load Scripts -->
-  <script>
-    let mapLoaded = false;
-    function lazyLoadMap() {
-      if (!mapLoaded) {
-        mapLoaded = true;
-
-        const gmaps = document.createElement('script');
-        gmaps.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDIfZAl4HpvdM02gciIlthJBfoV6CnDd2E&callback=initMap";
-        gmaps.async = true;
-        gmaps.defer = true;
-        document.head.appendChild(gmaps);
-
-        const cluster = document.createElement('script');
-        cluster.src = "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js";
-        document.head.appendChild(cluster);
-
-        const locationsScript = document.createElement('script');
-        locationsScript.src = "locations.js";
-        document.head.appendChild(locationsScript);
-
-        const mapScript = document.createElement('script');
-        mapScript.src = "map.js";
-        document.head.appendChild(mapScript);
-      }
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          lazyLoadMap();
-          observer.disconnect();
-        }
-      });
-    }, { threshold: 0.1 });
-
-    document.addEventListener('DOMContentLoaded', function () {
-      const mapEl = document.getElementById('map');
-      if (mapEl) observer.observe(mapEl);
-
-      document.getElementById('toggleLocations').addEventListener('click', function () {
-        const wrapper = document.getElementById('projectLocationsWrapper');
-        if (wrapper.style.display === 'none') {
-          wrapper.style.display = 'block';
-          this.innerHTML = '▲';
-        } else {
-          wrapper.style.display = 'none';
-          this.innerHTML = '▼';
-        }
-      });
-    });
-  </script>
-</body>
 </html>
-
