@@ -1939,7 +1939,7 @@ const locations = [
       type: ["Self-Storage"],  // or use sector: if your filter logic requires it
       projects: 1,
       cutsheet: "https://marketing.jacksonmain.com/books/htfy/",
-      thumbnail: "https://marketing.jacksonmain.com/books/ymks/"
+      thumbnail: "thumbnails/interbay-self-storage.jpg"
     },
     {
       name: "Kent Self Storage",
@@ -2655,6 +2655,7 @@ const locations = [
     ];  
 
     
+
 
 
 
