@@ -4,10 +4,6 @@ let allBounds;
 
 window.initMap = function () {
   map = new google.maps.Map(document.getElementById("map"), {
-    setTimeout(() => {
-    google.maps.event.trigger(map, "resize");
-    map.panBy(0, 0); // Trigger a slight pan to force redraw
-    }, 500);
     center: { lat: 39.8283, lng: -98.5795 }, // Center of US
     zoom: 4,
     fullscreenControl: false,
@@ -36,12 +32,16 @@ window.initMap = function () {
     ]
   });
 
+  // Force map to render properly after load
+  setTimeout(() => {
+    google.maps.event.trigger(map, "resize");
+    map.panBy(0, 0); // Trigger a tiny pan to force redraw
+  }, 500);
+
   setupFilters();
   placeMarkers();
   setupFilterControls();
   filterMarkersAndTable();
-  google.maps.event.trigger(map, "resize");
-
 };
 
 function setupFilters() {
@@ -60,6 +60,7 @@ function setupFilters() {
       <label for="selectAllSectors"><strong>Select All</strong></label>
     </div>
   `;
+
   sorted.forEach(([type, count]) => {
     const id = type.replace(/\s+/g, '-').toLowerCase();
     filters.innerHTML += `
@@ -85,20 +86,20 @@ function placeMarkers() {
     });
 
     const popupHTML = `
-  <div style="padding:10px; max-width:250px; font-family:Arial; color:#004965;">
-    ${location.thumbnail ? `<img src="${location.thumbnail}" style="width:100%; height:auto; border-radius:4px; margin-bottom:8px;" alt="${location.name} thumbnail">` : ""}
-    <h3 style="margin:0; font-size:18px;">
-      ${location.cutsheet
-        ? `<a href="${location.cutsheet}" target="_blank" style="color:#004965; text-decoration:underline;">${location.name}</a>`
-        : location.name}
-    </h3>
-    <p style="margin:5px 0 0; font-size:14px; color:#515866;">
-      ${location.city ? location.city : ""}${location.state ? ", " + location.state : ""}
-    </p>
-  </div>
-`;
+      <div style="padding:10px; max-width:250px; font-family:Arial; color:#004965;">
+        ${location.thumbnail ? `<img src="${location.thumbnail}" style="width:100%; height:auto; border-radius:4px; margin-bottom:8px;" alt="${location.name} thumbnail">` : ""}
+        <h3 style="margin:0; font-size:18px;">
+          ${location.cutsheet
+            ? `<a href="${location.cutsheet}" target="_blank" style="color:#004965; text-decoration:underline;">${location.name}</a>`
+            : location.name}
+        </h3>
+        <p style="margin:5px 0 0; font-size:14px; color:#515866;">
+          ${location.city ? location.city : ""}${location.state ? ", " + location.state : ""}
+        </p>
+      </div>
+    `;
 
-const infoWindow = new google.maps.InfoWindow({ content: popupHTML });
+    const infoWindow = new google.maps.InfoWindow({ content: popupHTML });
 
     marker.addListener('click', () => infoWindow.open(map, marker));
     marker.locationData = location;
@@ -141,7 +142,6 @@ function filterMarkersAndTable() {
     }
   });
 
-  // Reset view to all markers if none selected
   if (visible.length === 0 || selected.length === 0) {
     map.fitBounds(allBounds);
   } else {
@@ -180,7 +180,7 @@ function updateTable(list) {
       </tr>`;
   });
 
-  // Enable table row clicks to zoom into map marker
+  // Click table to zoom map
   document.querySelectorAll('.project-link').forEach(link => {
     link.addEventListener('click', e => {
       const marker = markers.find(m => m.locationData.name === e.target.textContent.trim());
@@ -199,7 +199,8 @@ function updateCount(total) {
   const div = document.getElementById('projectTotal');
   div.innerHTML = `<strong>Total Projects Found:</strong> ${total}`;
 }
-// Ensure initMap is called after page is fully ready and locations are available
+
+// Final trigger to load map
 window.addEventListener('load', () => {
   if (typeof locations !== 'undefined' && Array.isArray(locations)) {
     initMap();
@@ -207,6 +208,8 @@ window.addEventListener('load', () => {
     console.error("Locations data not loaded or improperly formatted.");
   }
 });
+
+
 
 
 
