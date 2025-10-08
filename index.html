@@ -225,3 +225,30 @@
   </div>
 </body>
 </html>
+ <!-- Lazy Load Scripts -->
+  <script>
+    let mapLoaded = false;
+    function lazyLoadMap() {
+      if (!mapLoaded) {
+        mapLoaded = true;
+
+        const gmaps = document.createElement('script');
+        gmaps.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyDIfZAl4HpvdM02gciIlthJBfoV6CnDd2E&callback=initMap";
+        gmaps.async = true;
+        gmaps.defer = true;
+        document.head.appendChild(gmaps);
+
+        const cluster = document.createElement('script');
+        cluster.src = "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js";
+        document.head.appendChild(cluster);
+
+        const locationsScript = document.createElement('script');
+        locationsScript.src = "locations.js";
+        document.head.appendChild(locationsScript);
+
+        const mapScript = document.createElement('script');
+        mapScript.src = "map.js";
+        document.head.appendChild(mapScript);
+      }
+    }
+    const observer = new IntersectionObser
