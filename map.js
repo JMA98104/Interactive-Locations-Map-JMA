@@ -78,13 +78,21 @@ function placeMarkers() {
       }
     });
 
-    const infoWindow = new google.maps.InfoWindow({
-      content: `
-        <div style="padding: 10px; max-width: 250px; font-family: Arial; color: #004965;">
-          <h3 style="margin: 0; font-size: 18px;">${location.name}</h3>
-          <p style="margin: 5px 0 0; font-size: 14px; color: #515866;">${location.city}${location.state ? ', ' + location.state : ''}</p>
-        </div>`
-    });
+    const popupHTML = `
+  <div style="padding:10px; max-width:250px; font-family:Arial; color:#004965;">
+    ${location.thumbnail ? `<img src="${location.thumbnail}" style="width:100%; height:auto; border-radius:4px; margin-bottom:8px;" alt="${location.name} thumbnail">` : ""}
+    <h3 style="margin:0; font-size:18px;">
+      ${location.cutsheet
+        ? `<a href="${location.cutsheet}" target="_blank" style="color:#004965; text-decoration:underline;">${location.name}</a>`
+        : location.name}
+    </h3>
+    <p style="margin:5px 0 0; font-size:14px; color:#515866;">
+      ${location.city ? location.city : ""}${location.state ? ", " + location.state : ""}
+    </p>
+  </div>
+`;
+
+const infoWindow = new google.maps.InfoWindow({ content: popupHTML });
 
     marker.addListener('click', () => infoWindow.open(map, marker));
     marker.locationData = location;
@@ -178,3 +186,4 @@ function updateCount(total) {
   const div = document.getElementById('projectTotal');
   div.innerHTML = `<strong>Total Projects Found:</strong> ${total}`;
 }
+
